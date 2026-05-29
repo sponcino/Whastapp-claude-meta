@@ -1,6 +1,10 @@
 services:
   web:
-    image: nginx:alpine
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "npm install && npm run build && npm start"
     networks:
       - NazarNet
     deploy:
@@ -9,7 +13,7 @@ services:
         - "traefik.http.routers.nazar-chat.rule=Host(`nazar-chat.aisouthside.com`)"
         - "traefik.http.routers.nazar-chat.entrypoints=websecure"
         - "traefik.http.routers.nazar-chat.tls=true"
-        - "traefik.http.services.nazar-chat.loadbalancer.server.port=80"
+        - "traefik.http.services.nazar-chat.loadbalancer.server.port=3000"
 
 networks:
   NazarNet:
