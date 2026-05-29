@@ -3,8 +3,16 @@ services:
     image: sponcino23/whatsapp-claude-meta:latest
     volumes:
       - whatsapp_data:/app/data
-    environment:
-      - NODE_ENV=production
+environment:
+  - NODE_ENV=production
+  - META_VERIFY_TOKEN=sdfhsdfh23562g34r
+  - META_ACCESS_TOKEN=tu_token_real
+  - META_PHONE_NUMBER_ID=tu_phone_number_id
+  - META_WABA_ID=tu_waba_id
+  - META_APP_SECRET=tu_app_secret
+  - META_GRAPH_VERSION=v21.0
+  - OPENROUTER_API_KEY=tu_openrouter_key
+  - OPENROUTER_MODEL=openai/gpt-4o-mini
     networks:
       - NazarNet
     deploy:
