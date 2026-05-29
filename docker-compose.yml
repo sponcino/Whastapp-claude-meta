@@ -1,8 +1,18 @@
 services:
   web:
     image: nginx:alpine
-    ports:
-      - "8080:80"
     volumes:
       - ./dist:/usr/share/nginx/html:ro
-    restart: unless-stopped
+    networks:
+      - traefik_public
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.nazar-chat.rule=Host(`nazar-chat.aisouthside.com`)"
+        - "traefik.http.routers.nazar-chat.entrypoints=websecure"
+        - "traefik.http.routers.nazar-chat.tls=true"
+        - "traefik.http.services.nazar-chat.loadbalancer.server.port=80"
+
+networks:
+  traefik_public:
+    external: true
