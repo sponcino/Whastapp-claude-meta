@@ -7,7 +7,6 @@ import {
   wasMessageProcessed,
   markMessageProcessed,
 } from "@/lib/db";
-import { generateReply, type HistoryMessage } from "@/lib/openrouter";
 import { sendTextMessage } from "./client";
 
 export async function processWebhookPayload(payload: unknown): Promise<void> {
@@ -80,28 +79,87 @@ async function handleIncomingMessage(
   }
 
   const history = getRecentHistory(convo.id, 20);
-  const llmHistory: HistoryMessage[] = history.map((m) => ({
+  const historyForN8n = history.map((m) => ({
     role: m.role === "user" ? "user" : "assistant",
     content: m.content,
   }));
 
-  const t0 = Date.now();
-  let reply: string;
-  try {
-    reply = await generateReply(llmHistory);
-  } catch (err) {
-    console.error("[wh] error en LLM:", err);
+  await callN8nWebhook({
+    conversationId: convo.id,
+    phone,
+    name: pushName,
+    message: text,
+    history: historyForN8n,
+  });
+}
+
+interface N8nPayload {
+  conversationId: number;
+  phone: string;
+  name: string | null;
+  message: string;
+  history: { role: string; content: string }[];
+}
+
+async function callN8nWebhook(payload: N8nPayload): Promise<void> {
+  const n8nUrl = process.env.N8N_WEBHOOK_URL;
+  const secret = process.env.N8N_CALLBACK_SECRET;
+
+  if (!n8nUrl) {
+    console.error("[wh] N8N_WEBHOOK_URL no configurado — no se puede responder");
     return;
   }
-  console.log(`[wh] LLM en ${Date.now() - t0}ms`);
 
-  const msgId = insertMessage(convo.id, "assistant", reply, null);
+  // La URL base de la app, necesaria para que n8n sepa dónde llamar de vuelta.
+  // En producción: https://nazar-chat.aisouthside.com
+  // En local: http://localhost:3000
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.APP_URL ??
+    "http://localhost:3000";
+
+  const body = {
+    ...payload,
+    callbackUrl: `${appUrl}/api/n8n/reply`,
+    callbackSecret: secret ?? "",
+  };
 
   try {
-    const { wa_message_id } = await sendTextMessage(phone, reply);
-    updateMessageWaId(msgId, wa_message_id);
-    console.log(`[wh] → enviado a ${phone} (wamid: ${wa_message_id})`);
+    const res = await fetch(n8nUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error(`[wh] n8n respondió ${res.status}: ${txt}`);
+    } else {
+      console.log(`[wh] → payload enviado a n8n para conversación ${payload.conversationId}`);
+    }
   } catch (err) {
-    console.error("[wh] error enviando a Graph:", err);
+    console.error("[wh] error llamando a n8n:", err);
   }
+}
+
+// Función exportada para que /api/n8n/reply pueda enviar la respuesta
+// una vez que n8n terminó de procesar.
+export async function deliverN8nReply(
+  conversationId: number,
+  reply: string
+): Promise<{ messageId: number; wa_message_id: string }> {
+  const convo = getConversationById(conversationId);
+  if (!convo) throw new Error(`Conversación ${conversationId} no encontrada`);
+
+  // Re-verificar que siga en modo AI (pudo haber cambiado mientras n8n procesaba)
+  if (convo.mode !== "AI") {
+    throw new Error(`Conversación ${conversationId} ya no está en modo AI`);
+  }
+
+  const msgId = insertMessage(conversationId, "assistant", reply, null);
+
+  const { wa_message_id } = await sendTextMessage(convo.phone, reply);
+  updateMessageWaId(msgId, wa_message_id);
+
+  console.log(`[n8n] → respuesta enviada a ${convo.phone} (wamid: ${wa_message_id})`);
+  return { messageId: msgId, wa_message_id };
 }

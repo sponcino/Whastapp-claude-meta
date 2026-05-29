@@ -30,11 +30,16 @@ export default function ConnectionGate() {
   const checkConnection = useCallback(async () => {
     setRefreshing(true);
     try {
-      const res = await fetch("/api/connection/status");
+      const res = await fetch("/api/connection/status", { cache: "no-store" });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
       setConnStatus(data);
-    } catch {
-      setConnStatus({ status: "error", message: "No se pudo conectar al servidor" });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[ConnectionGate] error al verificar conexión:", msg);
+      setConnStatus({ status: "error", message: msg });
     } finally {
       setRefreshing(false);
     }
@@ -43,6 +48,13 @@ export default function ConnectionGate() {
   useEffect(() => {
     checkConnection();
   }, [checkConnection]);
+
+  // Reintenta automáticamente si el servidor todavía estaba compilando al arrancar
+  useEffect(() => {
+    if (connStatus.status !== "error") return;
+    const t = setTimeout(() => checkConnection(), 3000);
+    return () => clearTimeout(t);
+  }, [connStatus.status, checkConnection]);
 
   const fetchConversations = useCallback(async () => {
     if (connStatus.status !== "connected") return;
