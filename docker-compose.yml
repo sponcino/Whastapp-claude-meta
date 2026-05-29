@@ -1,18 +1,23 @@
 services:
   web:
-    image: node:20-alpine
-    working_dir: /app
+    build: .
     volumes:
-      - ./:/app
-    command: sh -c "npm install && npm run build && npm start"
+      - whatsapp_data:/app/data
+    environment:
+      - NODE_ENV=production
     networks:
       - NazarNet
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nazar-chat.rule=Host(`nazar-chat.aisouthside.com`)"
-      - "traefik.http.routers.nazar-chat.entrypoints=websecure"
-      - "traefik.http.routers.nazar-chat.tls=true"
-      - "traefik.http.services.nazar-chat.loadbalancer.server.port=3000"
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.whatsapp-claude.rule=Host(`nazar-chat.aisouthside.com`)"
+        - "traefik.http.routers.whatsapp-claude.entrypoints=websecure"
+        - "traefik.http.routers.whatsapp-claude.tls=true"
+        - "traefik.http.services.whatsapp-claude.loadbalancer.server.port=3000"
+
+volumes:
+  whatsapp_data:
 
 networks:
   NazarNet:
