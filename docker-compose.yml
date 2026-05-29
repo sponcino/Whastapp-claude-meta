@@ -12,9 +12,9 @@ services:
       META_APP_SECRET: "e2de55933315017a0cb91d2255910f09"
       META_VERIFY_TOKEN: "sdfhsdfh23562g34r"
       META_GRAPH_VERSION: "v21.0"
-      N8N_WEBHOOK_URL="https://nazar-n8nwh.aisouthside.com/webhook/nazar"
-      N8N_CALLBACK_SECRET="nazarbot123"
-      APP_URL="https://nazar-chat.aisouthside.com"
+      N8N_WEBHOOK_URL= "https://nazar-n8nwh.aisouthside.com/webhook/nazar"
+      N8N_CALLBACK_SECRET= "nazarbot123"
+      APP_URL= "https://nazar-chat.aisouthside.com"
       
     networks:
       - NazarNet
