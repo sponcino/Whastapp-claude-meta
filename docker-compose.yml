@@ -15,7 +15,7 @@ services:
         - "traefik.http.routers.whatsapp-claude.rule=Host(`nazar-chat.aisouthside.com`)"
         - "traefik.http.routers.whatsapp-claude.entrypoints=websecure"
         - "traefik.http.routers.whatsapp-claude.tls=true"
-        - "traefik.http.routers.whatsapp-claude.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.whatsapp-claude.tls.certresolver=letsencryptresolver"
         - "traefik.http.services.whatsapp-claude.loadbalancer.server.port=3000"
 
 volumes:
