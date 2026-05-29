@@ -3,9 +3,16 @@ services:
     image: sponcino23/whatsapp-claude-meta:latest
     volumes:
       - whatsapp_data:/app/data
-    environment:
-      NODE_ENV: "production"
-      META_VERIFY_TOKEN: "sdfhsdfh23562g34r"
+environment:
+  NODE_ENV: "production"
+
+  META_ACCESS_TOKEN: "EAAOWC94c4toBRnZC6mM9AH6ZAZB0wfxZA2sFGgSAz0UtqZBvRRUbXyD1STngC6QtElXJWdIrBhUSc199fRXJFg7Pt38rORZBCtGP7j9hZC7ZBYwuoBpqeZCjzJeXGJGxsaxXe5cjMZBRXc7ZCwOcpFa2QZBfijmLxtZAkBe9MvvwPaIpS8SCA9fJoGM43rdtVSx2PjjOYQQZDZD"
+  META_PHONE_NUMBER_ID: "1168674769657072"
+  META_WABA_ID: "1753662435619984"
+  META_APP_SECRET: "e2de55933315017a0cb91d2255910f09"
+  META_VERIFY_TOKEN: "sdfhsdfh23562g34r"
+  META_GRAPH_VERSION: "v21.0"
+  
     networks:
       - NazarNet
     deploy:
