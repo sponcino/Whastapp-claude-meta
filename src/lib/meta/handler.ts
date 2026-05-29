@@ -86,18 +86,11 @@ async function handleIncomingMessage(
     return;
   }
 
-  const history = getRecentHistory(convo.id, 20);
-  const historyForN8n = history.map((m) => ({
-    role: m.role === "user" ? "user" : "assistant",
-    content: m.content,
-  }));
-
   await callN8nWebhook({
     conversationId: convo.id,
     phone,
     name: pushName,
     message: text,
-    history: historyForN8n,
   });
 }
 
@@ -106,7 +99,6 @@ interface N8nPayload {
   phone: string;
   name: string | null;
   message: string;
-  history: { role: string; content: string }[];
 }
 
 async function callN8nWebhook(payload: N8nPayload): Promise<void> {
