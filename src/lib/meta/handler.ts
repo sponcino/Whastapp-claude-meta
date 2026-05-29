@@ -53,6 +53,14 @@ async function handleIncomingMessage(
     return;
   }
 
+  // Ignorar mensajes con más de 5 minutos de antigüedad (reintentos viejos de Meta)
+  const msgTimestamp = parseInt(msg.timestamp as string, 10);
+  const ageSeconds = Math.floor(Date.now() / 1000) - msgTimestamp;
+  if (ageSeconds > 300) {
+    console.log(`[wh] mensaje ignorado (antigüedad: ${Math.floor(ageSeconds / 60)} min)`);
+    return;
+  }
+
   const waMsgId = msg.id as string;
 
   if (wasMessageProcessed(waMsgId)) {
