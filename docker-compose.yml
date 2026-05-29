@@ -1,6 +1,6 @@
 services:
   web:
-    build: .
+    image: sponcino/whatsapp-claude-meta:latest
     volumes:
       - whatsapp_data:/app/data
     environment:
