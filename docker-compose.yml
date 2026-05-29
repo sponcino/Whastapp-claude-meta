@@ -6,24 +6,17 @@ services:
     environment:
       NODE_ENV: "production"
       META_VERIFY_TOKEN: "sdfhsdfh23562g34r"
-      META_ACCESS_TOKEN: "TU_TOKEN_REAL"
-      META_PHONE_NUMBER_ID: "TU_PHONE_NUMBER_ID"
-      META_WABA_ID: "TU_WABA_ID"
-      META_APP_SECRET: "TU_APP_SECRET"
-      META_GRAPH_VERSION: "v21.0"
-      OPENROUTER_API_KEY: "TU_OPENROUTER_KEY"
-      OPENROUTER_MODEL: "openai/gpt-4o-mini"
     networks:
       - NazarNet
     deploy:
-  replicas: 1
-  labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.whatsapp-claude.rule=Host(`nazar-chat.aisouthside.com`)"
-    - "traefik.http.routers.whatsapp-claude.entrypoints=websecure"
-    - "traefik.http.routers.whatsapp-claude.tls=true"
-    - "traefik.http.routers.whatsapp-claude.tls.certresolver=letsencrypt"
-    - "traefik.http.services.whatsapp-claude.loadbalancer.server.port=3000"
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.whatsapp-claude.rule=Host(`nazar-chat.aisouthside.com`)"
+        - "traefik.http.routers.whatsapp-claude.entrypoints=websecure"
+        - "traefik.http.routers.whatsapp-claude.tls=true"
+        - "traefik.http.routers.whatsapp-claude.tls.certresolver=letsencrypt"
+        - "traefik.http.services.whatsapp-claude.loadbalancer.server.port=3000"
 
 volumes:
   whatsapp_data:
