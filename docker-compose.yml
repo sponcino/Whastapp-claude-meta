@@ -16,15 +16,14 @@ services:
     networks:
       - NazarNet
     deploy:
-      replicas: 1
-      labels:
-labels:
-  - "traefik.enable=true"
-  - "traefik.http.routers.whatsapp-claude.rule=Host(`nazar-chat.aisouthside.com`)"
-  - "traefik.http.routers.whatsapp-claude.entrypoints=websecure"
-  - "traefik.http.routers.whatsapp-claude.tls=true"
-  - "traefik.http.routers.whatsapp-claude.tls.certresolver=letsencrypt"
-  - "traefik.http.services.whatsapp-claude.loadbalancer.server.port=3000"
+  replicas: 1
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.whatsapp-claude.rule=Host(`nazar-chat.aisouthside.com`)"
+    - "traefik.http.routers.whatsapp-claude.entrypoints=websecure"
+    - "traefik.http.routers.whatsapp-claude.tls=true"
+    - "traefik.http.routers.whatsapp-claude.tls.certresolver=letsencrypt"
+    - "traefik.http.services.whatsapp-claude.loadbalancer.server.port=3000"
 
 volumes:
   whatsapp_data:
